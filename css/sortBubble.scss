@@ -1,0 +1,44 @@
+//variable
+$styleBorder: (left:(radius:left, delete:right), right:(radius:right, delete:left));
+$colorBorder: (red: red, green: green);
+
+$paddingBorder: 4px;
+$widthEl: 40px;
+$styleTransform: (left:-48px, right:48px);//40px+2*4px
+
+.bubble {
+  text-align: center;
+  .array div {
+    padding: $paddingBorder;
+    width: $widthEl;
+    display: inline-block;
+    border: 1px solid transparent;
+    p{
+      margin:0;
+    }
+    @each $nameClass, $style in $styleBorder {
+      &.#{$nameClass}Side {
+        border-color: black;
+        border-#{map-get($style,delete)}: none;
+        border-top-#{map-get($style,radius)}-radius: 50%;
+        border-bottom-#{map-get($style,radius)}-radius: 50%;
+        transition: border-color 0s ease-in-out;
+        p {
+          transition: transform 0s ease-in-out;
+        }
+      }
+    }
+    @each $nameClass, $color in $colorBorder {
+      &.#{$nameClass} {
+        border-color:$color;
+        transition: border-color 0.5s ease-in-out;
+      }
+    }
+    @each $nameClass, $transform in $styleTransform {
+      &.#{$nameClass} p {
+        transform: translateX($transform);
+        transition: transform 2s ease-in-out 1s;
+      }
+    }
+  }
+}

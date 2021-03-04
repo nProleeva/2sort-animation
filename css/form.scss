@@ -1,0 +1,15 @@
+form {
+  #random:checked {
+      background: blue;
+  }
+  input[type="submit"], #min {
+    margin-left: 0;
+  }
+  #min, #max, #quantity {
+    margin: 0.2rem 0.5rem;
+    width: 20%;
+  }
+  .red {
+    border-color: red;
+  }
+}
