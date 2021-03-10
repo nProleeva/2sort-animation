@@ -1,0 +1,18 @@
+$paddingBorder: 4px;
+$widthEl: 40px;
+
+.animationSort {
+  text-align: center;
+
+  .array div {
+    padding: $paddingBorder;
+    width: $widthEl;
+    display: inline-block;
+    border: 1px solid transparent;
+    border-radius: 50%;
+
+    p {
+      margin: 0;
+    }
+  }
+}

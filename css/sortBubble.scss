@@ -2,28 +2,30 @@
 $styleBorder: (left:(radius:left, delete:right), right:(radius:right, delete:left));
 $colorBorder: (red: red, green: green);
 
-$paddingBorder: 4px;
-$widthEl: 40px;
 $styleTransform: (left:-48px, right:48px);//40px+2*4px
 
-.bubble {
-  text-align: center;
+.animationSort {
   .array div {
-    padding: $paddingBorder;
-    width: $widthEl;
-    display: inline-block;
-    border: 1px solid transparent;
-    p{
-      margin:0;
+    .comparison {
+      opacity: 0;
+      position:absolute;
+      right:-3.5px;
+      top:2px;
+      transition: opacity 0.5s ease-in-out;
+    }
+    &.leftSide .comparison.opacity{
+      opacity: 1;
     }
     @each $nameClass, $style in $styleBorder {
       &.#{$nameClass}Side {
         border-color: black;
         border-#{map-get($style,delete)}: none;
+        border-radius: 0;
         border-top-#{map-get($style,radius)}-radius: 50%;
         border-bottom-#{map-get($style,radius)}-radius: 50%;
         transition: border-color 0s ease-in-out;
-        p {
+        position: relative;
+        p:not(.comparison) {
           transition: transform 0s ease-in-out;
         }
       }
@@ -35,7 +37,7 @@ $styleTransform: (left:-48px, right:48px);//40px+2*4px
       }
     }
     @each $nameClass, $transform in $styleTransform {
-      &.#{$nameClass} p {
+      &.#{$nameClass} p:not(.comparison) {
         transform: translateX($transform);
         transition: transform 2s ease-in-out 1s;
       }

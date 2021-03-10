@@ -4,8 +4,8 @@ import React from 'react'
 
 function* sort(array, method){
     let newArray = new Array(...array);
-    for(let i=0;i<(newArray.length-1);i++)
-        for (let j=0;j<(newArray.length-1); j++) {
+    for (let i=0; i<(newArray.length-1); i++)
+        for (let j=0; j<(newArray.length-1); j++) {
             let min = newArray[j] < newArray[j+1],
                 equally = newArray[j] === newArray[j+1],
                 flagSwap = (min && method.waning) || (!min && !equally && method.increase);
@@ -100,7 +100,7 @@ class SortBubble extends React.Component {
         function outputFlagSwap($1,$2='',$3=''){
             return _this.state.flagSwap>0 ? $1 : _this.state.flagSwap===false? $2:$3
         }
-        return <div className="bubble">
+        return <React.Fragment>
             <div className="array">
             {
                 _this.state.array.map(function (item, index) {
@@ -109,14 +109,16 @@ class SortBubble extends React.Component {
                         if (index===_this.state.numberBubble) classSide = `leftSide ${outputFlagSwap('red','green')} ${outputFlagSwap('right')}`;
                         else classSide = `rightSide ${outputFlagSwap('red','green')} ${outputFlagSwap('left')}`;
                     }
-                    return <div className={classSide}><p>{item}</p></div>
+                    return <div className={classSide}>
+                        <p>{item}</p>
+                        <p className={!_this.state.cancel && _this.state.flagSwap>-1?'comparison opacity':'comparison'}>{(_this.props.method.increase&&_this.state.flagSwap===true)||(_this.props.method.waning&&_this.state.flagSwap!==true)? '≥' : '≤'}</p>
+                    </div>
                 })
             }
             </div>
-            {!_this.state.cancel && <div className="comparison"><p>{_this.state.array[_this.state.numberBubble]} {_this.props.method.increase? '≤' : '≥'} {_this.state.array[_this.state.numberBubble+1]} = {outputFlagSwap('false','true ','?    ')}</p></div>}
             <button onClick={_this.updateState} disabled={_this.state.done}>Следующая операчия</button>
             {_this.state.done && <p>Сортировка закончена</p>}
-        </div>
+        </React.Fragment>
     }
 }
 
