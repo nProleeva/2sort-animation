@@ -3,7 +3,7 @@ require('../css/sortBubble.scss');
 import React from 'react'
 
 function* sort(array, method){
-    let newArray = new Array(...array);
+    let newArray = array.concat();
     for (let i=0; i<(newArray.length-1); i++)
         for (let j=0; j<(newArray.length-1); j++) {
             let min = newArray[j] < newArray[j+1],
@@ -60,7 +60,7 @@ class SortBubble extends React.Component {
             clearInterval(this.state.timerId);
             this.setState( state=>{
                 let obj = state;
-                obj.array = new Array(...obj.newArray);
+                obj.array = obj.newArray.concat();
                 obj.cancel = true;
                 obj.flagSwap = -1;
                 return obj;
@@ -75,7 +75,7 @@ class SortBubble extends React.Component {
             const timerId = setTimeout(()=>{
                 const newTimerId = setTimeout(()=> {
                     this.setState({
-                        array: new Array(...newState.array),
+                        array: newState.array.concat(),
                         flagSwap: -1,
                         cancel: true
                     })
@@ -86,7 +86,7 @@ class SortBubble extends React.Component {
                 });
             }, 2000);
             this.setState({
-                newArray: new Array(...newState.array),
+                newArray: newState.array.concat(),
                 numberBubble: newState.numberBubble,
                 flagSwap: -1,
                 timerId: timerId,
