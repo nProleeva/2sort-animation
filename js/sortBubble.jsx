@@ -2,6 +2,7 @@ require('../css/sortBubble.scss');
 
 import React from 'react'
 
+//сортировка пузырьком, generator
 function* sort(array, method){
     let newArray = array.concat();
     for (let i=0; i<(newArray.length-1); i++)
@@ -55,6 +56,7 @@ class SortBubble extends React.Component {
             this.updateState();
         }
     }
+    //конец таймера
     cancel() {
         if(!this.state.cancel) {
             clearInterval(this.state.timerId);
@@ -67,6 +69,7 @@ class SortBubble extends React.Component {
             });
         }
     }
+    //анимация пузырька
     updateState() {
         this.cancel();
         let next = this.sort.next();

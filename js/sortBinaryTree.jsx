@@ -2,6 +2,7 @@ require('../css/sortBinaryTree.scss');
 
 import React from 'react'
 
+//построение веток дерева
 function treeBuilding(root, newBranch=null) {
     let branch = root;
     if(!newBranch)
@@ -17,6 +18,7 @@ function treeBuilding(root, newBranch=null) {
     else
         branch.left = newBranch;
 }
+//сортировка дерева, generator
 function* sort(root,increase=true) {
     if (root.left || root.right) {
         if (root.left && increase) yield* sort(root.left)
@@ -26,7 +28,6 @@ function* sort(root,increase=true) {
         else if (root.left && !increase) yield* sort(root.left, increase)
     }
     else yield root.value;
-
 }
 
 class SortBinaryTree extends React.Component {
@@ -42,6 +43,7 @@ class SortBinaryTree extends React.Component {
         this.allEl = this.allEl.bind(this);
         this.updateState = this.updateState.bind(this);
     }
+    //построение дерева
     allEl() {
         let root = {};
         let tree = this.state.oldArray.map(function(el, index) {
@@ -57,6 +59,7 @@ class SortBinaryTree extends React.Component {
         });
         this.setState({tree:tree});
     }
+    //построение нового массива
     updateState() {
         if(this.state.newArray.length === 0) {
             this.sort = sort(this.state.tree[0], this.props.method.increase);

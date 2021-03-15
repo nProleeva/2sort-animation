@@ -35,6 +35,7 @@ class Form extends React.Component {
         this.handleRandom = this.handleRandom.bind(this);
         this.handleInputText = this.handleInputText.bind(this);
     }
+    //handleRadio преднназначена для всех radio в for, nameObj объект объединенных input
     handleRadio(nameObj, event) {
         this.setState((state)=>{
             let obj = state;
@@ -45,6 +46,7 @@ class Form extends React.Component {
             return obj;
         });
     }
+    //правильно заполнить input массива
     handleInputText(event) {
         let value = event.target.value.replace(/[^0-9,\-]/g,'');
         if(value.search(/\-\-|[0-9]\-/)>-1) value = value.replace(/\-\-|[0-9]\-/,all=>all.replace(/\-$/,''));
@@ -57,6 +59,7 @@ class Form extends React.Component {
             return obj;
         });
     }
+    //правильно заполнить input рандомного масиива, минимальное и максимальное значение массива
     handleRandom(event) {
         let value = event.target.value.replace(/[^0-9\-]/g,'');
         if(/^\-0/.test(value)) value = value.replace(/^\-/,'');
@@ -69,6 +72,7 @@ class Form extends React.Component {
             return obj;
         });
     }
+    //количество элементов в массиве(random)
     handleQuantity(event) {
         let value = event.target.value.replace(/[^0-9]/g,'').replace(/^0/,'');
         if(value.search(/^[0-9]{4,}$/)===0) value = value.replace(/[0-9]$/,'');
@@ -81,6 +85,7 @@ class Form extends React.Component {
     getRandomIntInclusive(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min; //Максимум и минимум включаются
     }
+    //создается неотсортированный массив
     handleBegin(event) {
         let array=[];
         if(this.state.arrayRadio.random) {
