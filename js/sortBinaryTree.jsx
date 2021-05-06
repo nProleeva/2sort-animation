@@ -1,6 +1,7 @@
 require('../css/sortBinaryTree.scss');
 
 import React from 'react'
+import BinaryTree from "./animationBinaryTree.jsx";
 
 //построение веток дерева
 function treeBuilding(root, newBranch=null) {
@@ -17,24 +18,26 @@ function treeBuilding(root, newBranch=null) {
         branch.right = newBranch;
     else
         branch.left = newBranch;
+
+    newBranch.branch = branch.branch+1;
+    newBranch.previous = branch;
 }
 //сортировка дерева, generator
 function* sort(root,increase=true) {
     if (root.left || root.right) {
         if (root.left && increase) yield* sort(root.left)
         else if(root.right && !increase) yield* sort(root.right,increase)
-        yield root.value;
+        yield root;
         if (root.right && increase) yield* sort(root.right)
         else if (root.left && !increase) yield* sort(root.left, increase)
     }
-    else yield root.value;
+    else yield root;
 }
 
 class SortBinaryTree extends React.Component {
     constructor(props) {
         super(props);
         this.state={
-            oldArray:props.array,
             tree: [],
             newArray:[],
             done: false
@@ -46,12 +49,14 @@ class SortBinaryTree extends React.Component {
     //построение дерева
     allEl() {
         let root = {};
-        let tree = this.state.oldArray.map(function(el, index) {
+        let tree = this.props.array.map(function(el, index) {
             let branch = {
-                value: el
+                value: el,
+                index: index
             };
             if(index===0) {
                 root = branch;
+                root.branch = 0;
                 treeBuilding(root);
             }
             else treeBuilding(root,branch);
@@ -64,35 +69,28 @@ class SortBinaryTree extends React.Component {
         if(this.state.newArray.length === 0) {
             this.sort = sort(this.state.tree[0], this.props.method.increase);
             let array = [];
-            for (let value of this.sort)
-                array.push(value);
+            for (let branch of this.sort)
+                array.push(branch.value);
             this.setState({done:true,newArray:array});
         }
     }
     componentDidMount() {
         this.allEl();
     }
-    componentDidUpdate() {
-        if (this.state.oldArray!==this.props.array) {
+    componentDidUpdate(prevProps) {
+        if (prevProps!==this.props) {
+            this.allEl();
             this.setState({
-                oldArray:this.props.array,
-                tree: [],
                 newArray:[],
                 done: false
             });
-            this.allEl();
         }
     }
     render() {
         const _this = this;
+
         return <React.Fragment>
-            <div className="array">
-                {
-                    _this.state.oldArray.map(function (item, index) {
-                        return <div><p>{item}</p></div>
-                    })
-                }
-            </div>
+            <BinaryTree oldArray={_this.props.array} tree={_this.state.tree}></BinaryTree>
             <button onClick={_this.updateState} disabled={_this.state.done}>Собрать массив</button>
             {_this.state.newArray.length > 0 &&
             <div className="array">

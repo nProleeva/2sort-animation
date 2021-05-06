@@ -1,0 +1,37 @@
+.tree{
+  position:relative;
+  > div {
+    border:2px solid black;
+    border-radius: 50%;
+    color: black;
+    position: absolute;
+    transition: border-color 1s ease-in-out;
+    padding: 4px;
+    width: 40px;
+    p {
+      margin: 0;
+    }
+    .after, .before {
+      border-bottom:2px solid red;
+      position:absolute;
+      width:0;
+      height:0;
+      top: 48px;
+      transition: color 1s ease-in-out;
+    }
+    .after {
+      transform-origin: top left;
+    }
+    .before {
+      transform-origin: top right;
+    }
+    &.active {
+      border-color: orange;
+    }
+    .after, .before {
+      &:not(.active) {
+        color:transparent;
+      }
+    }
+  }
+}
