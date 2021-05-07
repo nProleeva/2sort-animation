@@ -1,71 +1,54 @@
 require('../css/animationTree.scss');
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 
-function* animationTree(branch) {
-    if(branch.previous) yield* animationTree(branch.previous);
-    yield branch;
-}
-function* recursioIBLeft(root) {
-    if(root.right) yield* recursioIBLeft(root.right)
-    yield root;
-    if(root.left) yield* recursioIBLeft(root.left)
-}
-function* recursioIBRight(root) {
-    if(root.left) yield* recursioIBRight(root.left)
-    yield root;
-    if(root.right) yield* recursioIBRight(root.right)
-}
+function BinaryTree(props) {
+    // Объявление переменных состояния
+    const [indexArray, setIndexArray] = useState([]),
+        [indexBranch, setIndexBranch] = useState([]),
+        [widthTree, setWidthTree] = useState(0);
 
-class BinaryTree extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state={
-            indexArray:[],
-            indexBranch: [],
-            widthTree:0
-        }
-        this.updateIndexBranch = this.updateIndexBranch.bind(this);
-        this.updateWidthTree = this.updateWidthTree.bind(this);
-        this.refTree = React.createRef();
+    const refTree = React.createRef();
+
+    //componentDidMount, componentDidUpdate
+    useEffect(()=>{
+        setIndexArray([]);
+        setIndexBranch(updateIndexBranch());
+        setWidthTree(updateWidthTree());
+    }, [props.tree]);
+
+    function* animationTree(branch={}) {
+        if(branch.previous) yield* animationTree(branch.previous);
+        yield branch;
     }
-    componentDidMount() {
-        this.setState({
-            indexBranch: this.updateIndexBranch(),
-            indexArray: [],
-            widthTree: this.updateWidthTree()
-        });
-    }
-    componentDidUpdate(prevProps) {
-        if(prevProps!==this.props) {
-            this.setState({
-                indexBranch: this.updateIndexBranch(),
-                indexArray: [],
-                widthTree: this.updateWidthTree()
-            });
-        }
+    function* recursioIB(root,left = true) {
+        if(root.right && left) yield* recursioIB(root.right, left)
+        else if(root.left && !left) yield* recursioIB(root.left, left)
+        yield root;
+        if(root.left && left) yield* recursioIB(root.left, left)
+        else if(root.right && !left) yield* recursioIB(root.right, left)
     }
 
-    updateWidthTree() {
-        return this.refTree.current.offsetWidth/2
+    function updateWidthTree() {
+        return refTree.current.offsetWidth/2
     }
-    updateIndexBranch() {
-        let length = this.props.tree.length,
+    function updateIndexBranch() {
+        let length = props.tree.length,
             indexBranch = new Array(length),
             left = -1,
             right = 1;
         if(length) {
             indexBranch[0] = 0;
-            if(this.props.tree[0].left) {
-                this.left = recursioIBLeft(this.props.tree[0].left);
-                for (let branch of this.left){
+            if(props.tree[0].left) {
+                let FuncLeft = recursioIB(props.tree[0].left,true);
+                for (let branch of FuncLeft){
                     indexBranch[branch.index] = left;
                     left--;
                 }
             }
-            if(this.props.tree[0].right) {
-                this.right = recursioIBRight(this.props.tree[0].right);
-                for (let branch of this.right) {
+            if(props.tree[0].right) {
+                let funcRight = recursioIB(props.tree[0].right,false);
+                for (let branch of funcRight) {
                     indexBranch[branch.index] = right;
                     right++;
                 }
@@ -73,45 +56,42 @@ class BinaryTree extends React.Component {
         }
         return indexBranch
     }
-    clickElArray(index) {
-        this.animation = animationTree(this.props.tree[index]);
-        let array = [];
-        for (let branch of this.animation)
+    function clickElArray(index) {
+        let animation = animationTree(props.tree[index]),
+            array = [];
+        for (let branch of animation)
             array.push(branch.index);
-        this.setState({indexArray:array});
+        setIndexArray(array);
     }
 
-    render() {
-        let _this = this,
-            widthBranch = 52,
-            maxHeightBranch = 50,
-            heightLine = maxHeightBranch - 30 + 30/2,
-            widthTree = _this.state.widthTree + Math.min(..._this.state.indexBranch)*widthBranch,
-            styleTree = {
-                height: (Math.max(...(_this.props.tree.length?_this.props.tree.map(el=>el.branch):[0]))+1)*maxHeightBranch,
-                left: (-1)*widthTree
+    let widthBranch = 52,
+        maxHeightBranch = 50,
+        heightLine = maxHeightBranch - 30 + 30/2,
+        styleTree = {
+            height: (Math.max(...(props.tree.length?props.tree.map(el=>el.branch):[0]))+1)*maxHeightBranch,
+            left: (-1)*(widthTree + Math.min(...indexBranch.length?indexBranch:[0])*widthBranch),
+        }
+    return <React.Fragment>
+        <div className="array">
+            {
+                props.oldArray.map(function (item,index) {
+                    return <div onClick={clickElArray.bind(this,index)} className={Math.max(...indexArray)===index?'active':''}><p>{item}</p></div>
+                })
             }
-            console.log(_this.state.widthTree, Math.min(..._this.state.indexBranch)*widthBranch)
-        return <React.Fragment>
-            <div className="array">
-                {
-                    _this.props.oldArray.map(function (item,index) {
-                        return <div onClick={_this.clickElArray.bind(_this,index)} class={Math.max(..._this.state.indexArray)===index?'active':''}><p>{item}</p></div>
-                    })
-                }
-            </div>
-            <div className="tree" style={styleTree} ref={this.refTree}>
-                {
-                    _this.props.tree.map(function (item,index) {
+        </div>
+        <div className="tree" style={styleTree} ref={refTree}>
+            {
+                props.tree.map(function (item,index) {
 
-                        let style={
+                    let style={
                             top:item.branch*maxHeightBranch,
-                            left: `calc(50% + (${_this.state.indexBranch[index]*widthBranch}px))`
+                            left: `calc(50% + (${indexBranch[index]*widthBranch}px))`
                         },
-                            styleAfter = {},
-                            styleBefore = {};
-                        if(item.left){
-                            let width = (_this.state.indexBranch[index] - _this.state.indexBranch[item.left.index] - 0.5)*widthBranch,
+                        styleAfter = {},
+                        styleBefore = {};
+                    if(indexBranch.length) {
+                        if(item.left) {
+                            let width = (indexBranch[index] - indexBranch[item.left.index] - 0.5)*widthBranch,
                                 d = Math.sqrt(heightLine**2+width**2), //высчитываем диагональ
                                 sin = heightLine/d, //...синус угла между диагональю и стороной
                                 deg = Math.asin(sin) * (180/Math.PI); //...угол
@@ -123,7 +103,7 @@ class BinaryTree extends React.Component {
                             }
                         }
                         if(item.right) {
-                            let width = (_this.state.indexBranch[item.right.index] - _this.state.indexBranch[index] - 0.5)*widthBranch,
+                            let width = (indexBranch[item.right.index] - indexBranch[index] - 0.5)*widthBranch,
                                 d = Math.sqrt(heightLine**2+width**2), //высчитываем диагональ
                                 sin = heightLine/d, //...синус угла между диагональю и стороной
                                 deg = Math.asin(sin) * (180/Math.PI); //...угол
@@ -134,17 +114,17 @@ class BinaryTree extends React.Component {
                                 right: (-1)*width
                             }
                         }
-                        if(_this.state.indexArray.includes(index)){
+                        if(indexArray.includes(index)){
                             style.transitionDelay = `${item.branch*5}s`;
                             styleAfter.transitionDelay = `${item.branch*5 + 1.5}s`;
                             styleBefore.transitionDelay = `${item.branch*5 + 1.5}s`;
-                            console.log(index, item.left&&_this.state.indexArray.includes(item.left.index), item.right&&_this.state.indexArray.includes(item.right.index))
                         }
-                        return <div className={_this.state.indexArray.includes(index)?'active':''} style={style}><p className={`after ${item.left&&_this.state.indexArray.includes(item.left.index)?'active':''}`} style={styleAfter}>&lt;</p><p>{item.value}</p><p className={`before ${item.right&&_this.state.indexArray.includes(item.right.index)?'active':''}`} style={styleBefore}>&le;</p></div>
-                    })
-                }
-            </div>
-        </React.Fragment>
-    }
+                    }
+                    return <div className={indexArray.includes(index)?'active':''} style={style}><p className={`after ${item.left&&indexArray.includes(item.left.index)?'active':''}`} style={styleAfter}>&lt;</p><p>{item.value}</p><p className={`before ${item.right&&indexArray.includes(item.right.index)?'active':''}`} style={styleBefore}>&le;</p></div>
+                })
+            }
+        </div>
+    </React.Fragment>
 }
+
 export default BinaryTree
