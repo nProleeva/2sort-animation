@@ -6,7 +6,8 @@ function BinaryTree(props) {
     // Объявление переменных состояния
     const [indexArray, setIndexArray] = useState([]),
         [indexBranch, setIndexBranch] = useState([]),
-        [widthTree, setWidthTree] = useState(0);
+        [widthTree, setWidthTree] = useState(0),
+        [arrayTimerId, setArrayTimerId] = useState([]);
 
     const refTree = React.createRef();
 
@@ -15,6 +16,17 @@ function BinaryTree(props) {
         setIndexArray([]);
         setIndexBranch(updateIndexBranch());
         setWidthTree(updateWidthTree());
+    }, [props.tree]);
+    useEffect(()=>{
+        let interval = 0,
+            arrayTimerId = [];
+        props.tree.map((item,index)=> {
+            interval+=5*item.branch;
+            //timerId, чтобы можно было отключить все таймеры, если хочется прервать анимацию
+            //let timerId = setTimeout(() => { clickElArray(index) },interval);
+            //arrayTimerId.push(timerId);
+        })
+        setArrayTimerId(arrayTimerId);
     }, [props.tree]);
 
     function* animationTree(branch={}) {
