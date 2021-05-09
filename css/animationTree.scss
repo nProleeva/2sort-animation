@@ -20,7 +20,7 @@
       transition: color,border-color 1.5s ease-in-out;
       &:not(.active) {
         color:transparent;
-        transition: color 1.5s ease-in-out 0s;
+        transition: color 1.5s ease-in-out 0s !important;
       }
       &.transparent {
         border-color: transparent;
@@ -39,7 +39,7 @@
       opacity: 0;
     }
     &:not(.active) {
-      transition: border-color 1.5s ease-in-out 0s;
+      transition: border-color 1.5s ease-in-out 0s !important;
     }
   }
 }
