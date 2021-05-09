@@ -7,26 +7,36 @@ function BinaryTree(props) {
     const [indexArray, setIndexArray] = useState([]),
         [indexBranch, setIndexBranch] = useState([]),
         [widthTree, setWidthTree] = useState(0),
-        [arrayTimerId, setArrayTimerId] = useState([]);
+        [objTimer, setObjTimer] = useState({timerId: null,
+                                            flagTimer: 0});
 
     const refTree = React.createRef();
 
     //componentDidMount, componentDidUpdate
     useEffect(()=>{
-        setIndexArray([]);
         setIndexBranch(updateIndexBranch());
         setWidthTree(updateWidthTree());
+        clearTimer();
     }, [props.tree]);
     useEffect(()=>{
-        let interval = 0,
-            arrayTimerId = [];
-        props.tree.map((item,index)=> {
-            interval+=5*item.branch;
-            //timerId, чтобы можно было отключить все таймеры, если хочется прервать анимацию
-            //let timerId = setTimeout(() => { clickElArray(index) },interval);
-            //arrayTimerId.push(timerId);
-        })
-        setArrayTimerId(arrayTimerId);
+        let delay = 0,
+            arrayTimerId = [],
+            index = 0;
+        let timerId = setTimeout(function request() {
+            if (index < props.tree.length) {
+                clickElArray(index);
+                // увеличить интервал для следующего запроса
+                delay=index===props.tree.length?2000:5000*props.tree[index].branch+2000;
+                timerId = setTimeout(request, delay);
+                index++;
+                setObjTimer({timerId,
+                            flagTimer: 1});
+            }
+            else clearTimer();
+
+        }, delay);
+        setObjTimer({timerId,
+                    flagTimer: 1});
     }, [props.tree]);
 
     function* animationTree(branch={}) {
@@ -75,6 +85,12 @@ function BinaryTree(props) {
             array.push(branch.index);
         setIndexArray(array);
     }
+    function clearTimer() {
+        clearTimeout(objTimer.timerId);
+        setIndexArray([]);
+        setObjTimer({timerId:null,
+                    flagTimer: 0});
+    }
 
     let widthBranch = 52,
         maxHeightBranch = 50,
@@ -100,7 +116,8 @@ function BinaryTree(props) {
                             left: `calc(50% + (${indexBranch[index]*widthBranch}px))`
                         },
                         styleAfter = {},
-                        styleBefore = {};
+                        styleBefore = {},
+                        maxIndex = Math.max(...indexArray);
                     if(indexBranch.length) {
                         if(item.left) {
                             let width = (indexBranch[index] - indexBranch[item.left.index] - 0.5)*widthBranch,
@@ -128,11 +145,11 @@ function BinaryTree(props) {
                         }
                         if(indexArray.includes(index)){
                             style.transitionDelay = `${item.branch*5}s`;
-                            styleAfter.transitionDelay = `${item.branch*5 + 1.5}s`;
-                            styleBefore.transitionDelay = `${item.branch*5 + 1.5}s`;
+                            styleAfter.transitionDelay = `${item.branch*5 + 2.5}s`;
+                            styleBefore.transitionDelay = `${item.branch*5 + 2.5}s`;
                         }
                     }
-                    return <div className={indexArray.includes(index)?'active':''} style={style}><p className={`after ${item.left&&indexArray.includes(item.left.index)?'active':''}`} style={styleAfter}>&lt;</p><p>{item.value}</p><p className={`before ${item.right&&indexArray.includes(item.right.index)?'active':''}`} style={styleBefore}>&le;</p></div>
+                    return <div className={`${indexArray.includes(index)?'active':''} ${objTimer.flagTimer&&index>maxIndex?'transparent':''}`} style={style}><p className={`after ${item.left&&indexArray.includes(item.left.index)?'active':''} ${objTimer.flagTimer&&item.left&&item.left.index>maxIndex?'transparent':''}`} style={styleAfter}>&lt;</p><p>{item.value}</p><p className={`before ${item.right&&indexArray.includes(item.right.index)?'active':''} ${objTimer.flagTimer&&item.right&&item.right.index>maxIndex?'transparent':''}`} style={styleBefore}>&le;</p></div>
                 })
             }
         </div>

@@ -5,7 +5,7 @@
     border-radius: 50%;
     color: black;
     position: absolute;
-    transition: border-color 1s ease-in-out;
+    transition: border-color, opacity 2s ease-in-out;
     padding: 4px;
     width: 40px;
     p {
@@ -17,7 +17,14 @@
       width:0;
       height:0;
       top: 48px;
-      transition: color 1s ease-in-out;
+      transition: color,border-color 1.5s ease-in-out;
+      &:not(.active) {
+        color:transparent;
+        transition: color 1.5s ease-in-out 0s;
+      }
+      &.transparent {
+        border-color: transparent;
+      }
     }
     .after {
       transform-origin: top left;
@@ -28,10 +35,11 @@
     &.active {
       border-color: orange;
     }
-    .after, .before {
-      &:not(.active) {
-        color:transparent;
-      }
+    &.transparent {
+      opacity: 0;
+    }
+    &:not(.active) {
+      transition: border-color 1.5s ease-in-out 0s;
     }
   }
 }

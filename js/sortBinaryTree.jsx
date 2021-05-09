@@ -91,7 +91,7 @@ class SortBinaryTree extends React.Component {
 
         return <React.Fragment>
             <BinaryTree oldArray={_this.props.array} tree={_this.state.tree}></BinaryTree>
-            <button onClick={_this.updateState} disabled={_this.state.done}>обрать массив</button>
+            <button onClick={_this.updateState} disabled={_this.state.done}>Cобрать массив</button>
             {_this.state.newArray.length > 0 &&
             <div className="array">
                 {
