@@ -39,8 +39,7 @@ class SortBinaryTree extends React.Component {
         super(props);
         this.state={
             tree: [],
-            newArray:[],
-            done: false
+            newArray:[]
         }
 
         this.allEl = this.allEl.bind(this);
@@ -62,45 +61,41 @@ class SortBinaryTree extends React.Component {
             else treeBuilding(root,branch);
             return branch;
         });
-        this.setState({tree:tree});
+        return tree;
     }
     //построение нового массива
-    updateState() {
-        if(this.state.newArray.length === 0) {
-            this.sort = sort(this.state.tree[0], this.props.method.increase);
+    updateState(tree) {
+        if(this.state.newArray.length === 0&&tree.length) {
+            this.sort = sort(tree[0], this.props.method.increase);
             let array = [];
             for (let branch of this.sort)
-                array.push(branch.value);
-            this.setState({done:true,newArray:array});
+                array.push(branch);
+            return array;
         }
     }
     componentDidMount() {
-        this.allEl();
+        let tree = this.allEl();
+        this.setState(
+            {
+                tree,
+                newArray: this.updateState(tree)
+            });
     }
     componentDidUpdate(prevProps) {
         if (prevProps!==this.props) {
-            this.allEl();
-            this.setState({
-                newArray:[],
-                done: false
-            });
+            let tree = this.allEl();
+            this.setState(
+                {
+                    tree,
+                    newArray: this.updateState(tree)
+                });
         }
     }
     render() {
         const _this = this;
 
         return <React.Fragment>
-            <BinaryTree oldArray={_this.props.array} tree={_this.state.tree}></BinaryTree>
-            <button onClick={_this.updateState} disabled={_this.state.done}>Cобрать массив</button>
-            {_this.state.newArray.length > 0 &&
-            <div className="array">
-                {
-                    _this.state.newArray.map(function (item, index) {
-                        return <div><p>{item}</p></div>
-                    })
-                }
-            </div>
-            }
+            <BinaryTree oldArray={_this.props.array} tree={_this.state.tree} newArray={_this.state.newArray}></BinaryTree>
         </React.Fragment>
     }
 }

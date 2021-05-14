@@ -38,8 +38,13 @@
     &.transparent {
       opacity: 0;
     }
-    &:not(.active) {
-      transition: border-color 1.5s ease-in-out 0s !important;
+    &:not(.active){
+      transition: border-color,opacity 1.5s ease-in-out 0s !important;
     }
   }
 }
+.animationCollect {
+  animation:5s ease-in 0s collect;
+  transition-delay: 0s !important;
+}
+@keyframes collect { from,to { border-color: green }}

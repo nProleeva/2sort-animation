@@ -1,6 +1,6 @@
 require('../css/animationTree.scss');
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 function BinaryTree(props) {
     // Объявление переменных состояния
@@ -8,9 +8,10 @@ function BinaryTree(props) {
         [indexBranch, setIndexBranch] = useState([]),
         [widthTree, setWidthTree] = useState(0),
         [objTimer, setObjTimer] = useState({timerId: null,
-                                            flagTimer: 0});
+                                            flagTimer: false}),
+        [arrayCollect, setArrayCollect] = useState(false);
 
-    const refTree = React.createRef();
+    const refTree = useRef(null);
 
     //componentDidMount, componentDidUpdate
     useEffect(()=>{
@@ -30,13 +31,13 @@ function BinaryTree(props) {
                 timerId = setTimeout(request, delay);
                 index++;
                 setObjTimer({timerId,
-                            flagTimer: 1});
+                            flagTimer: true});
             }
             else clearTimer();
 
         }, delay);
         setObjTimer({timerId,
-                    flagTimer: 1});
+                    flagTimer: true});
     }, [props.tree]);
 
     function* animationTree(branch={}) {
@@ -85,11 +86,16 @@ function BinaryTree(props) {
             array.push(branch.index);
         setIndexArray(array);
     }
+    function clickNewArray() {
+        clearTimer();
+        setArrayCollect(true)
+        console.log(props.newArray);
+    }
     function clearTimer() {
         clearTimeout(objTimer.timerId);
         setIndexArray([]);
         setObjTimer({timerId:null,
-                    flagTimer: 0});
+                    flagTimer: false});
     }
 
     let widthBranch = 52,
@@ -148,11 +154,24 @@ function BinaryTree(props) {
                             styleAfter.transitionDelay = `${item.branch*5 + 2.5}s`;
                             styleBefore.transitionDelay = `${item.branch*5 + 2.5}s`;
                         }
+                        else if(arrayCollect) {
+                            style.animationDelay = `${props.newArray.findIndex((el)=>el==item)*5}s`;
+                        }
                     }
-                    return <div className={`${indexArray.includes(index)?'active':''} ${objTimer.flagTimer&&index>maxIndex?'transparent':''}`} style={style}><p className={`after ${item.left&&indexArray.includes(item.left.index)?'active':''} ${objTimer.flagTimer&&item.left&&item.left.index>maxIndex?'transparent':''}`} style={styleAfter}>&lt;</p><p>{item.value}</p><p className={`before ${item.right&&indexArray.includes(item.right.index)?'active':''} ${objTimer.flagTimer&&item.right&&item.right.index>maxIndex?'transparent':''}`} style={styleBefore}>&le;</p></div>
+                    return <div className={`${arrayCollect?'animationCollect':''} ${indexArray.includes(index)?'active':''} ${objTimer.flagTimer&&index>maxIndex?'transparent':''}`} style={style}><p className={`after ${item.left&&indexArray.includes(item.left.index)?'active':''} ${objTimer.flagTimer&&item.left&&item.left.index>maxIndex?'transparent':''}`} style={styleAfter}>&lt;</p><p>{item.value}</p><p className={`before ${item.right&&indexArray.includes(item.right.index)?'active':''} ${objTimer.flagTimer&&item.right&&item.right.index>maxIndex?'transparent':''}`} style={styleBefore}>&le;</p></div>
                 })
             }
         </div>
+        <button onClick={clickNewArray} disabled={arrayCollect}>Cобрать массив</button>
+        {arrayCollect &&
+        <div className="array">
+            {
+                props.newArray.map(function (item, index) {
+                    return <div class='animationCollect' style={{animationDelay:`${index*5}s`}}><p>{item.value}</p></div>
+                })
+            }
+        </div>
+        }
     </React.Fragment>
 }
 
